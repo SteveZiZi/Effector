@@ -1,0 +1,47 @@
+#!/bin/sh
+
+#call user config script first
+/mnt/dyjc/script/usercfg.sh
+
+if [ -r /mnt/update/auto_update.key ]; then
+	echo "Receive update key,now updating..."
+	rm -f /mnt/update/auto_update.key
+	cd /mnt/
+	tar -zxvf /mnt/update/update.tgz
+	chmod +x /mnt/dyjc/script/*
+	rm -f /mnt/update/update.tgz
+	reboot
+fi
+
+count=0
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/mnt/dyjc/program"
+sleep 1
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/mnt/dyjc/program"
+sleep 1
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/mnt/dyjc/program"
+sleep 1
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/mnt/dyjc/program"
+
+/mnt/dyjc/script/ipconfig.sh
+
+chmod 777 /mnt/dyjc/program/*
+
+sleep 1
+
+insmod /mnt/dyjc/program/st7539_lcd.ko &
+
+insmod /mnt/dyjc/program/kgetc.ko &
+
+sleep 3
+while [ 1 ] ;do
+	chmod +x /mnt/dyjc/program/dyjc
+	chmod +x /mnt/dyjc/program/*.so
+	/mnt/dyjc/program/dyjc -exec all
+	sleep 5
+	let count=count+1
+	echo "ptu running times is $count"
+	if [ "$count" -gt 3600 ]; then
+		echo "Will reboot because of DJS running too many times"
+		reboot
+	fi
+done

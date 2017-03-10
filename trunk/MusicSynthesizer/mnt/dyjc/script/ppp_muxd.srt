@@ -1,0 +1,2 @@
+#!/bin/sh
+# Path to pppMuxd binary, and short-form for messages
